@@ -256,9 +256,13 @@ document.addEventListener('keydown', (e) => {
   const pad = PAD_BY_KEY[key];
   if (!pad) return;
 
-  // Find the pad button element
-  const btnEl = document.querySelector(`.pad-btn[data-pad-id="${pad.id}"]`);
-  triggerPad(pad.id, btnEl);
+  // Prevent browser default (e.g. "z" = undo/back) when game is active
+  if (screens.game.classList.contains('active')) {
+    e.preventDefault();
+    e.stopPropagation();
+    const btnEl = document.querySelector(`.pad-btn[data-pad-id="${pad.id}"]`);
+    triggerPad(pad.id, btnEl);
+  }
 });
 
 // ---- Escape to quit game ----
