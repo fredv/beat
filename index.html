@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beat Machine — Learn Maschine MK2</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Title Screen -->
+  <div id="screen-title" class="screen active">
+    <div class="title-content">
+      <h1>BEAT<span class="accent">MACHINE</span></h1>
+      <p class="subtitle">Master the Native Instruments Maschine MK2</p>
+      <div class="pad-grid-preview" id="pad-preview"></div>
+      <button id="btn-start" class="btn-primary">START</button>
+      <p class="hint">Click or press any key to begin</p>
+    </div>
+  </div>
+
+  <!-- Song Select Screen -->
+  <div id="screen-select" class="screen">
+    <div class="select-content">
+      <h2>SELECT PATTERN</h2>
+      <div id="song-list" class="song-list"></div>
+      <div class="pad-legend" id="pad-legend"></div>
+      <button id="btn-back-title" class="btn-secondary">BACK</button>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="screen-game" class="screen">
+    <div class="game-hud">
+      <div class="hud-left">
+        <div class="score-label">SCORE</div>
+        <div id="hud-score" class="score-value">0</div>
+      </div>
+      <div class="hud-center">
+        <div id="hud-combo" class="combo-display"></div>
+        <div id="hud-rating" class="rating-display"></div>
+      </div>
+      <div class="hud-right">
+        <div class="multiplier-label">MULTIPLIER</div>
+        <div id="hud-multiplier" class="multiplier-value">x1</div>
+        <div id="hud-progress" class="progress-bar"><div id="hud-progress-fill"></div></div>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <div class="pad-display" id="pad-display"></div>
+  </div>
+
+  <!-- Results Screen -->
+  <div id="screen-results" class="screen">
+    <div class="results-content">
+      <h2>PATTERN COMPLETE</h2>
+      <div id="results-song" class="results-song"></div>
+      <div class="results-stats">
+        <div class="stat">
+          <span class="stat-label">SCORE</span>
+          <span id="results-score" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">MAX COMBO</span>
+          <span id="results-combo" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">PERFECT</span>
+          <span id="results-perfect" class="stat-value accent">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">GREAT</span>
+          <span id="results-great" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">GOOD</span>
+          <span id="results-good" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">MISSED</span>
+          <span id="results-missed" class="stat-value danger">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">ACCURACY</span>
+          <span id="results-accuracy" class="stat-value">0%</span>
+        </div>
+      </div>
+      <div class="results-grade" id="results-grade">S</div>
+      <div class="results-buttons">
+        <button id="btn-retry" class="btn-primary">RETRY</button>
+        <button id="btn-back-select" class="btn-secondary">SONG SELECT</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
