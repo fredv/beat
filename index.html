@@ -23,6 +23,15 @@
     <div class="select-content">
       <h2>SELECT PATTERN</h2>
       <div id="song-list" class="song-list"></div>
+      <div class="bpm-adjust" id="bpm-adjust">
+        <span class="bpm-label">BPM</span>
+        <button id="bpm-down-10" class="bpm-btn">-10</button>
+        <button id="bpm-down" class="bpm-btn">-5</button>
+        <span id="bpm-value" class="bpm-value">100</span>
+        <button id="bpm-up" class="bpm-btn">+5</button>
+        <button id="bpm-up-10" class="bpm-btn">+10</button>
+        <button id="bpm-reset" class="bpm-btn bpm-reset">RESET</button>
+      </div>
       <div class="pad-legend" id="pad-legend"></div>
       <button id="btn-back-title" class="btn-secondary">BACK</button>
     </div>
@@ -40,6 +49,7 @@
         <div id="hud-rating" class="rating-display"></div>
       </div>
       <div class="hud-right">
+        <div class="bpm-hud"><span class="bpm-hud-label">BPM</span> <span id="hud-bpm">100</span></div>
         <div class="multiplier-label">MULTIPLIER</div>
         <div id="hud-multiplier" class="multiplier-value">x1</div>
         <div id="hud-progress" class="progress-bar"><div id="hud-progress-fill"></div></div>

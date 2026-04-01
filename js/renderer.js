@@ -193,8 +193,22 @@ export function render(gameState) {
     ctx.stroke();
   }
 
-  // Countdown overlay
-  if (gameState.countdown > 0) {
+  // Preview / Countdown overlay
+  if (gameState.phase === 'preview') {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#ff6b00';
+    ctx.font = '700 28px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(gameState.previewMessage || 'LISTEN...', W / 2, H / 2 - 10);
+    // Pulsing dot animation
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+    ctx.fillStyle = `rgba(255,107,0,${0.3 + pulse * 0.5})`;
+    ctx.beginPath();
+    ctx.arc(W / 2, H / 2 + 30, 6 + pulse * 4, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (gameState.countdown > 0) {
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#ff6b00';

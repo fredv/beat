@@ -183,6 +183,74 @@ body {
 }
 .song-card .diff-dot.filled { background: var(--accent); }
 
+/* BPM Adjuster */
+.bpm-adjust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border: 1px solid #333;
+  border-radius: 8px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.bpm-adjust.hidden { display: none; }
+.bpm-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+.bpm-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  min-width: 60px;
+  text-align: center;
+}
+.bpm-btn {
+  background: var(--surface2);
+  border: 1px solid #444;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.bpm-btn:hover {
+  background: #2a2a40;
+  border-color: var(--accent);
+}
+.bpm-btn.bpm-reset {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+/* BPM in game HUD */
+.bpm-hud {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+  margin-bottom: 2px;
+}
+.bpm-hud-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+#hud-bpm {
+  color: var(--text);
+  font-weight: 700;
+}
+
 /* Pad Legend */
 .pad-legend {
   display: grid;

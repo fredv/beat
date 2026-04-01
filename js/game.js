@@ -9,15 +9,24 @@ const MISS_THRESHOLD = 0.18; // Notes past this are auto-missed
 
 const COMBO_MULT_THRESHOLDS = [0, 10, 25, 50, 100]; // combo -> multiplier index
 
+const PREVIEW_BARS = 1; // Play this many bars as a groove preview before countdown
+
 export function createGame(song) {
   const beatsPerSec = song.bpm / 60;
   const secPerBeat = 60 / song.bpm;
   const totalBeats = song.bars * 4;
+  const previewBeats = PREVIEW_BARS * 4;
+  const previewSec = previewBeats * secPerBeat;
 
   // Deep copy notes and sort by beat
   const notes = song.notes
     .map(n => ({ ...n, hit: false, missed: false }))
     .sort((a, b) => a.beat - b.beat);
+
+  // Build preview schedule: first bar's notes played automatically
+  const previewNotes = notes
+    .filter(n => n.beat < previewBeats)
+    .map(n => ({ beat: n.beat, pad: n.pad }));
 
   return {
     song,
@@ -25,9 +34,15 @@ export function createGame(song) {
     beatsPerSec,
     secPerBeat,
     totalBeats,
+    // Preview phase
+    previewSec,
+    previewBeats,
+    previewNotes,
+    previewPlayed: new Set(),
+    phase: 'preview', // 'preview' -> 'countdown' -> 'playing'
     // Timing
     startTime: 0,
-    currentBeat: -4, // 4-beat lead-in countdown
+    currentBeat: -4, // set properly during phases
     countdown: 4,
     elapsed: 0,
     finished: false,
@@ -45,6 +60,8 @@ export function createGame(song) {
     lastRating: null,
     // Metronome tracking
     lastMetronomeBeat: -999,
+    // Preview message
+    previewMessage: 'LISTEN TO THE GROOVE...',
   };
 }
 
@@ -55,12 +72,59 @@ export function startGame(game) {
 export function updateGame(game) {
   const now = performance.now() / 1000;
   game.elapsed = now - game.startTime;
-  const leadInSec = 4 * game.secPerBeat;
-  game.currentBeat = (game.elapsed - leadInSec) * game.beatsPerSec;
-  game.countdown = Math.max(0, leadInSec - game.elapsed);
 
-  // Metronome — plays on every quarter-note beat (countdown + during song)
-  const absoluteBeat = Math.floor(game.elapsed * game.beatsPerSec);
+  const countdownBeats = 4;
+  const countdownSec = countdownBeats * game.secPerBeat;
+
+  if (game.phase === 'preview') {
+    // During preview, auto-play the first bar so player hears the groove
+    const previewBeat = game.elapsed * game.beatsPerSec;
+    for (const pn of game.previewNotes) {
+      const key = `${pn.beat}-${pn.pad}`;
+      if (!game.previewPlayed.has(key) && previewBeat >= pn.beat) {
+        game.previewPlayed.add(key);
+        playPad(pn.pad);
+      }
+    }
+    // Keep the highway frozen (notes visible but not scrolling toward hit line)
+    game.currentBeat = -countdownBeats - 2;
+    game.countdown = countdownBeats;
+
+    // Transition to countdown after preview finishes
+    if (game.elapsed >= game.previewSec + 0.3) { // small gap after preview
+      game.phase = 'countdown';
+      game.phaseStart = now;
+    }
+    return;
+  }
+
+  // Time since countdown phase started
+  const phaseElapsed = now - game.phaseStart;
+
+  if (game.phase === 'countdown') {
+    game.currentBeat = (phaseElapsed - countdownSec) * game.beatsPerSec;
+    game.countdown = Math.max(0, countdownSec - phaseElapsed);
+
+    // Metronome clicks during countdown
+    const absoluteBeat = Math.floor(phaseElapsed * game.beatsPerSec);
+    if (absoluteBeat > game.lastMetronomeBeat) {
+      game.lastMetronomeBeat = absoluteBeat;
+      playMetronome();
+    }
+
+    if (game.countdown <= 0) {
+      game.phase = 'playing';
+      game.previewMessage = null;
+    }
+    return;
+  }
+
+  // Playing phase
+  game.currentBeat = (phaseElapsed - countdownSec) * game.beatsPerSec;
+  game.countdown = 0;
+
+  // Metronome during play
+  const absoluteBeat = Math.floor(phaseElapsed * game.beatsPerSec);
   if (absoluteBeat > game.lastMetronomeBeat && game.currentBeat < game.totalBeats) {
     game.lastMetronomeBeat = absoluteBeat;
     playMetronome();

@@ -47,6 +47,20 @@ function initTitle() {
 
 // ---- Song Select Screen ----
 let selectedSong = null;
+let customBpm = null;    // null = use song default
+let activeSongDefault = null;
+
+function updateBpmDisplay() {
+  const bpmVal = document.getElementById('bpm-value');
+  const bpmAdjust = document.getElementById('bpm-adjust');
+  if (!activeSongDefault) {
+    bpmAdjust.classList.add('hidden');
+    return;
+  }
+  bpmAdjust.classList.remove('hidden');
+  const bpm = customBpm ?? activeSongDefault;
+  bpmVal.textContent = bpm;
+}
 
 function initSelect() {
   const list = document.getElementById('song-list');
@@ -69,12 +83,54 @@ function initSelect() {
       `;
       card.addEventListener('click', () => {
         selectedSong = song;
-        launchGame(song);
+        activeSongDefault = song.bpm;
+        customBpm = null;
+        updateBpmDisplay();
+      });
+      // Double-click to launch immediately
+      card.addEventListener('dblclick', () => {
+        selectedSong = song;
+        activeSongDefault = song.bpm;
+        launchGameWithBpm(song);
       });
       list.appendChild(card);
     }
   }
   buildList();
+
+  // BPM adjustment buttons
+  const bpmAdjust = document.getElementById('bpm-adjust');
+  bpmAdjust.classList.add('hidden');
+
+  function adjustBpm(delta) {
+    if (!activeSongDefault) return;
+    const current = customBpm ?? activeSongDefault;
+    customBpm = Math.max(40, Math.min(300, current + delta));
+    updateBpmDisplay();
+  }
+
+  document.getElementById('bpm-down-10').addEventListener('click', (e) => { e.stopPropagation(); adjustBpm(-10); });
+  document.getElementById('bpm-down').addEventListener('click', (e) => { e.stopPropagation(); adjustBpm(-5); });
+  document.getElementById('bpm-up').addEventListener('click', (e) => { e.stopPropagation(); adjustBpm(5); });
+  document.getElementById('bpm-up-10').addEventListener('click', (e) => { e.stopPropagation(); adjustBpm(10); });
+  document.getElementById('bpm-reset').addEventListener('click', (e) => {
+    e.stopPropagation();
+    customBpm = null;
+    updateBpmDisplay();
+  });
+
+  // Play button — add a start button below the BPM adjuster
+  // We'll repurpose the song card click: single click selects, showing BPM adjuster;
+  // user clicks a "PLAY" button or double-clicks to start.
+  const playBtn = document.createElement('button');
+  playBtn.id = 'btn-play-song';
+  playBtn.className = 'btn-primary';
+  playBtn.textContent = 'PLAY';
+  playBtn.style.marginBottom = '16px';
+  playBtn.addEventListener('click', () => {
+    if (selectedSong) launchGameWithBpm(selectedSong);
+  });
+  bpmAdjust.after(playBtn);
 
   // Build pad legend
   const legend = document.getElementById('pad-legend');
@@ -88,6 +144,12 @@ function initSelect() {
   }
 
   document.getElementById('btn-back-title').addEventListener('click', () => showScreen('title'));
+}
+
+function launchGameWithBpm(song) {
+  const bpm = customBpm ?? song.bpm;
+  const adjusted = { ...song, bpm };
+  launchGame(adjusted);
 }
 
 // ---- Game Screen ----
@@ -154,6 +216,7 @@ function updateHUD(game) {
   const comboEl = document.getElementById('hud-combo');
   comboEl.textContent = game.combo > 1 ? `${game.combo} COMBO` : '';
   document.getElementById('hud-multiplier').textContent = `x${game.multiplier}`;
+  document.getElementById('hud-bpm').textContent = game.song.bpm;
 
   const ratingEl = document.getElementById('hud-rating');
   if (game.lastRating) {
@@ -182,7 +245,7 @@ function showResults(game) {
 }
 
 document.getElementById('btn-retry').addEventListener('click', () => {
-  if (selectedSong) launchGame(selectedSong);
+  if (selectedSong) launchGameWithBpm(selectedSong);
 });
 document.getElementById('btn-back-select').addEventListener('click', () => showScreen('select'));
 
