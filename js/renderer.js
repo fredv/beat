@@ -1,7 +1,7 @@
 // Canvas renderer — Guitar-Hero-style scrolling highway
 import { PAD_BY_ID } from './audio.js';
 
-const HIT_LINE_Y_RATIO = 0.82; // Where the hit line sits (from top)
+const HIT_LINE_Y_RATIO = 0.68; // Where the hit line sits (from top)
 const NOTE_SPEED = 400;        // Pixels per second of scroll
 const NOTE_HEIGHT = 18;
 const NOTE_RADIUS = 6;
@@ -77,9 +77,13 @@ export function render(gameState) {
     ctx.stroke();
   }
 
-  // Hit line
-  ctx.strokeStyle = 'rgba(255,107,0,0.8)';
-  ctx.lineWidth = 3;
+  // Hit zone background — wide translucent band
+  ctx.fillStyle = 'rgba(255,107,0,0.07)';
+  ctx.fillRect(offsetX, hitY - 24, totalWidth, 48);
+
+  // Hit line — thick and bright
+  ctx.strokeStyle = 'rgba(255,107,0,0.9)';
+  ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(offsetX, hitY);
   ctx.lineTo(offsetX + totalWidth, hitY);
@@ -87,14 +91,24 @@ export function render(gameState) {
 
   // Glow effect on hit line
   ctx.shadowColor = '#ff6b00';
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = 'rgba(255,107,0,0.3)';
-  ctx.lineWidth = 8;
+  ctx.shadowBlur = 20;
+  ctx.strokeStyle = 'rgba(255,107,0,0.4)';
+  ctx.lineWidth = 12;
   ctx.beginPath();
   ctx.moveTo(offsetX, hitY);
   ctx.lineTo(offsetX + totalWidth, hitY);
   ctx.stroke();
   ctx.shadowBlur = 0;
+
+  // Border lines on hit zone
+  ctx.strokeStyle = 'rgba(255,107,0,0.2)';
+  ctx.lineWidth = 1;
+  for (const dy of [-24, 24]) {
+    ctx.beginPath();
+    ctx.moveTo(offsetX, hitY + dy);
+    ctx.lineTo(offsetX + totalWidth, hitY + dy);
+    ctx.stroke();
+  }
 
   // Lane labels at hit line
   ctx.font = '700 13px system-ui';

@@ -59,13 +59,11 @@ export function updateGame(game) {
   game.currentBeat = (game.elapsed - leadInSec) * game.beatsPerSec;
   game.countdown = Math.max(0, leadInSec - game.elapsed);
 
-  // Metronome during countdown
-  if (game.countdown > 0) {
-    const countBeat = Math.floor(game.elapsed * game.beatsPerSec);
-    if (countBeat > game.lastMetronomeBeat) {
-      game.lastMetronomeBeat = countBeat;
-      playMetronome();
-    }
+  // Metronome — plays on every quarter-note beat (countdown + during song)
+  const absoluteBeat = Math.floor(game.elapsed * game.beatsPerSec);
+  if (absoluteBeat > game.lastMetronomeBeat && game.currentBeat < game.totalBeats) {
+    game.lastMetronomeBeat = absoluteBeat;
+    playMetronome();
   }
 
   // Auto-miss notes that have passed
